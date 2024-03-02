@@ -40,7 +40,7 @@ if "initial_settings" not in st.session_state:
     st.session_state["initial_settings"] = True
 
 with st.sidebar:
-    st.markdown("# 🤖 聊天窗口")
+    st.markdown("# 🤖 Оно чт")
     # 创建容器的目的是配合自定义组件的监听操作
     chat_container = st.container()
     with chat_container:

@@ -40,12 +40,12 @@ if "initial_settings" not in st.session_state:
     st.session_state["initial_settings"] = True
 
 with st.sidebar:
-    st.markdown("# 🤖 Оно чт")
+    st.markdown("# 🤖 Окно чата")
     # 创建容器的目的是配合自定义组件的监听操作
     chat_container = st.container()
     with chat_container:
         current_chat = st.radio(
-            label="历史聊天窗口",
+            label="История чата",
             format_func=lambda x: x.split("_")[0] if "_" in x else x,
             options=st.session_state["history_chats"],
             label_visibility="collapsed",
@@ -162,7 +162,7 @@ with st.sidebar:
     """
     )
     st.markdown(
-        '<a href="https://github.com/PierXuY/ChatGPT-Assistant" target="_blank" rel="ChatGPT-Assistant">'
+        '<a href="https://github.com/PuchBuch/ChatGPT-Assistant" target="_blank" rel="ChatGPT-Assistant">'
         '<img src="https://badgen.net/badge/icon/GitHub?icon=github&amp;label=ChatGPT Assistant" alt="GitHub">'
         "</a>",
         unsafe_allow_html=True,
@@ -269,7 +269,7 @@ area_error = st.empty()
 st.write("\n")
 st.header("ChatGPT Assistant")
 tap_input, tap_context, tap_model, tab_func = st.tabs(
-    ["💬 聊天", "🗒️ 预设", "⚙️ 模型", "🛠️ 功能"]
+    ["💬 Чат", "🗒️ Старт", "⚙️ Модель", "🛠️ Функции"]
 )
 
 with tap_context:

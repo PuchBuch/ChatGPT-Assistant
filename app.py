@@ -14,15 +14,15 @@ if "apibase" in st.secrets:
 else:
     openai.api_base = "https://api.openai.com/v1"
 
-st.set_page_config(page_title="ChatGPT Assistant", layout="wide", page_icon="🤖")
-# 自定义元素样式
+st.set_page_config(page_title="ChatGPT Ассистент", layout="wide", page_icon="🤖")
+# Пользовательские стили елементов
 st.markdown(css_code, unsafe_allow_html=True)
 
 if "initial_settings" not in st.session_state:
-    # 历史聊天窗口
+    # Окно истории чатов
     st.session_state["path"] = "history_chats_file"
     st.session_state["history_chats"] = get_history_chats(st.session_state["path"])
-    # ss参数初始化
+    # инициализация параметра ss
     st.session_state["delete_dict"] = {}
     st.session_state["delete_count"] = 0
     st.session_state["voice_flag"] = ""
@@ -30,34 +30,35 @@ if "initial_settings" not in st.session_state:
     st.session_state["error_info"] = ""
     st.session_state["current_chat_index"] = 0
     st.session_state["user_input_content"] = ""
-    # 读取全局设置
+    # Чтение глобальных настроек
     if os.path.exists("./set.json"):
         with open("./set.json", "r", encoding="utf-8") as f:
             data_set = json.load(f)
         for key, value in data_set.items():
             st.session_state[key] = value
-    # 设置完成
+    # Настройка завершена
     st.session_state["initial_settings"] = True
 
 with st.sidebar:
     st.markdown("# 🤖 Окно чата")
-    # 创建容器的目的是配合自定义组件的监听操作
+    # Целью создания контейнера является взаимодействие с операцией прослушивания пользовательских компонентов.
     chat_container = st.container()
     with chat_container:
         current_chat = st.radio(
-            label="История чата",
+            label="Окно истории чата",
             format_func=lambda x: x.split("_")[0] if "_" in x else x,
             options=st.session_state["history_chats"],
             label_visibility="collapsed",
             index=st.session_state["current_chat_index"],
             key="current_chat"
             + st.session_state["history_chats"][st.session_state["current_chat_index"]],
-            # on_change=current_chat_callback  # 此处不适合用回调，无法识别到窗口增减的变动
+            # on_change=current_chat_callback  # Здесь не подходит использование обратных вызовов, изменения в увеличении или уменьшении окна не могут быть распознаны.
         )
     st.write("---")
 
 
-# 数据写入文件
+# Запись данных в фаил
+    
 def write_data(new_chat_name=current_chat):
     if "apikey" in st.secrets:
         st.session_state["paras"] = {
@@ -86,9 +87,9 @@ def reset_chat_name_fun(chat_name):
     current_chat_index = st.session_state["history_chats"].index(current_chat)
     st.session_state["history_chats"][current_chat_index] = new_name
     st.session_state["current_chat_index"] = current_chat_index
-    # 写入新文件
+    # Записать новый файл
     write_data(new_name)
-    # 转移数据
+    # передавать данные
     st.session_state["history" + new_name] = st.session_state["history" + current_chat]
     for item in [
         "context_select",
@@ -127,14 +128,14 @@ def delete_chat_fun():
 with st.sidebar:
     c1, c2 = st.columns(2)
     create_chat_button = c1.button(
-        "新建", use_container_width=True, key="create_chat_button"
+        "Новый", use_container_width=True, key="create_chat_button"
     )
     if create_chat_button:
         create_chat_fun()
         st.experimental_rerun()
 
     delete_chat_button = c2.button(
-        "删除", use_container_width=True, key="delete_chat_button"
+        "Удалить", use_container_width=True, key="delete_chat_button"
     )
     if delete_chat_button:
         delete_chat_fun()
@@ -150,15 +151,15 @@ with st.sidebar:
 
     st.write("\n")
     st.write("\n")
-    st.text_input("设定窗口名称：", key="set_chat_name", placeholder="点击输入")
+    st.text_input("Установить имя окна：", key="set_chat_name", placeholder="Нажмите чтобы войти")
     st.selectbox(
-        "选择模型：", index=0, options=["gpt-3.5-turbo", "gpt-4"], key="select_model"
+        "Выберите модель：", index=0, options=["gpt-3.5-turbo", "gpt-4"], key="select_model"
     )
     st.write("\n")
     st.caption(
         """
-    - 双击页面可直接定位输入栏
-    - Ctrl + Enter 可快捷提交问题
+    - Дважды щелкните на страницу, чтобы найти поле ввода
+    - Ctrl + Enter Быстро задать вопрос
     """
     )
     st.markdown(
@@ -168,7 +169,7 @@ with st.sidebar:
         unsafe_allow_html=True,
     )
 
-# 加载数据
+# Загрузить данные
 if "history" + current_chat not in st.session_state:
     for key, value in load_data(st.session_state["path"], current_chat).items():
         if key == "history":
@@ -177,7 +178,7 @@ if "history" + current_chat not in st.session_state:
             for k, v in value.items():
                 st.session_state[k + current_chat + "value"] = v
 
-# 保证不同chat的页面层次一致，否则会导致自定义组件重新渲染
+# Убедитесь, что уровни страниц разных чатов одинаковы, иначе пользовательский компонент будет отображаться повторно.
 container_show_messages = st.container()
 container_show_messages.write("")
 # 对话展示
@@ -185,7 +186,7 @@ with container_show_messages:
     if st.session_state["history" + current_chat]:
         show_messages(current_chat, st.session_state["history" + current_chat])
 
-# 核查是否有对话需要删除
+# Проверьте, нужно ли удалять какие-либо разговоры
 if any(st.session_state["delete_dict"].values()):
     for key, value in st.session_state["delete_dict"].items():
         try:
@@ -217,7 +218,7 @@ if any(st.session_state["delete_dict"].values()):
 
 
 def callback_fun(arg):
-    # 连续快速点击新建与删除会触发错误回调，增加判断
+    # Быстрое последовательное нажатие «Создать» и «Удалить» вызовет обратный вызов ошибки, что повысит качество оценки.
     if ("history" + current_chat in st.session_state) and (
         "frequency_penalty" + current_chat in st.session_state
     ):
@@ -257,28 +258,30 @@ def save_set(arg):
             )
 
 
-# 输入内容展示
+# Отображение входного контента
 area_user_svg = st.empty()
 area_user_content = st.empty()
-# 回复展示
+# Ответить, чтобы показать
 area_gpt_svg = st.empty()
 area_gpt_content = st.empty()
-# 报错展示
+# Отображение ошибок
 area_error = st.empty()
 
 st.write("\n")
-st.header("ChatGPT Assistant")
+st.header("ChatGPT Ассистент")
 tap_input, tap_context, tap_model, tab_func = st.tabs(
-    ["💬 Чат", "🗒️ Старт", "⚙️ Модель", "🛠️ Функции"]
+    ["💬 Чат", "🗒️ Начало", "⚙️ Модель", "🛠️ Функции"]
 )
 
 with tap_context:
     set_context_list = list(set_context_all.keys())
-    context_select_index = set_context_list.index(
-        st.session_state["context_select" + current_chat + "value"]
-    )
+    value = st.session_state.get("context_select" + current_chat + "value")
+    
+    # Поиск индекса значения в списке с обработкой отсутствия значения
+    context_select_index = set_context_list.index(value) if value in set_context_list else 0
+    
     st.selectbox(
-        label="选择上下文",
+        label="Выберите контекст",
         options=set_context_list,
         key="context_select" + current_chat,
         index=context_select_index,
@@ -288,7 +291,7 @@ with tap_context:
     st.caption(set_context_all[st.session_state["context_select" + current_chat]])
 
     st.text_area(
-        label="补充或自定义上下文：",
+        label="Дополните или настройте контекст：",
         key="context_input" + current_chat,
         value=st.session_state["context_input" + current_chat + "value"],
         on_change=callback_fun,
@@ -296,18 +299,18 @@ with tap_context:
     )
 
 with tap_model:
-    st.markdown("OpenAI API Key (可选)")
+    st.markdown("OpenAI API Key (Необязательно)")
     st.text_input(
-        "OpenAI API Key (可选)",
+        "OpenAI API Key (Необязательно)",
         type="password",
         key="apikey_input",
         label_visibility="collapsed",
     )
     st.caption(
-        "此Key仅在当前网页有效，且优先级高于Secrets中的配置，仅自己可用，他人无法共享。[官网获取](https://platform.openai.com/account/api-keys)"
+        "Этот ключ действителен только на текущей странице，его приоритет выше чем конфигарация в секретах，доступен только Вам，им нельзя поделится [Получить с официального сайта](https://platform.openai.com/account/api-keys)"
     )
 
-    st.markdown("包含对话次数：")
+    st.markdown("Время чата：")
     st.slider(
         "Context Level",
         0,
@@ -317,18 +320,19 @@ with tap_model:
         on_change=callback_fun,
         key="context_level" + current_chat,
         args=("context_level",),
-        help="表示每次会话中包含的历史对话次数，预设内容不计算在内。",
+        help="Указывает количество исторических разговоров，включенных в каждый сеанс. Предустановленный контент не включается",
     )
 
-    st.markdown("模型参数：")
+    st.markdown("Параметры модели：")
     st.slider(
         "Temperature",
         0.0,
         2.0,
         st.session_state["temperature" + current_chat + "value"],
         0.1,
-        help="""在0和2之间，应该使用什么样的采样温度？较高的值（如0.8）会使输出更随机，而较低的值（如0.2）则会使其更加集中和确定性。
-          我们一般建议只更改这个参数或top_p参数中的一个，而不要同时更改两个。""",
+        help="""от 0  до 2，Какую температуру проб следует использовать? более высокое значение (напр. 0,8) сделают вывод более случайным,
+           а более низкое значение（наприм.0.2）сделают его более целенаправленным и детерминированым.
+           Обычно мы рекомендуем изменять только один из этих параметров или параметр top_p, а не изменять оба параметра одновременно. """,
         on_change=callback_fun,
         key="temperature" + current_chat,
         args=("temperature",),
@@ -339,8 +343,8 @@ with tap_model:
         1.0,
         st.session_state["top_p" + current_chat + "value"],
         0.1,
-        help="""一种替代采用温度进行采样的方法，称为“基于核心概率”的采样。在该方法中，模型会考虑概率最高的top_p个标记的预测结果。
-          因此，当该参数为0.1时，只有包括前10%概率质量的标记将被考虑。我们一般建议只更改这个参数或采样温度参数中的一个，而不要同时更改两个。""",
+        help="""Альтернатива отбору проб с учетом температуры называется отбором проб, основанным на базовой вероятности. В этом методе модель учитывает результаты прогнозирования тегов top_p с наибольшей вероятностью.
+           Следовательно, когда этот параметр равен 0,1, будут учитываться только маркеры, включающие верхнюю 10%-ную массу вероятности. Обычно мы рекомендуем изменять только один из этих параметров или параметр температуры отбора проб, а не оба одновременно.""",
         on_change=callback_fun,
         key="top_p" + current_chat,
         args=("top_p",),
@@ -351,7 +355,7 @@ with tap_model:
         2.0,
         st.session_state["presence_penalty" + current_chat + "value"],
         0.1,
-        help="""该参数的取值范围为-2.0到2.0。正值会根据新标记是否出现在当前生成的文本中对其进行惩罚，从而增加模型谈论新话题的可能性。""",
+        help="""Диапазон значений этого параметра составляет от -2,0 до 2,0. Положительные значения наказывают новые токены в зависимости от того, появляются ли они в текущем сгенерированном тексте, тем самым увеличивая вероятность того, что модель говорит о новых темах.""",
         on_change=callback_fun,
         key="presence_penalty" + current_chat,
         args=("presence_penalty",),
@@ -362,22 +366,22 @@ with tap_model:
         2.0,
         st.session_state["frequency_penalty" + current_chat + "value"],
         0.1,
-        help="""该参数的取值范围为-2.0到2.0。正值会根据新标记在当前生成的文本中的已有频率对其进行惩罚，从而减少模型直接重复相同语句的可能性。""",
+        help="""Диапазон значений этого параметра составляет от -2,0 до 2,0. Положительные значения наказывают новые токены на основе их существующей частоты в сгенерированном в данный момент тексте, тем самым снижая вероятность того, что модель будет напрямую повторять одно и то же утверждение.""",
         on_change=callback_fun,
         key="frequency_penalty" + current_chat,
         args=("frequency_penalty",),
     )
     st.caption(
-        "[官网参数说明](https://platform.openai.com/docs/api-reference/completions/create)"
+        "[Описание параметров официального сайта](https://platform.openai.com/docs/api-reference/completions/create)"
     )
 
 with tab_func:
     c1, c2, c3 = st.columns(3)
     with c1:
-        st.button("清空聊天记录", use_container_width=True, on_click=clear_button_callback)
+        st.button("Удалить историю сообщений", use_container_width=True, on_click=clear_button_callback)
     with c2:
         btn = st.download_button(
-            label="导出聊天记录",
+            label="Экспортировать историю чата",
             data=download_history(st.session_state["history" + current_chat]),
             file_name=f'{current_chat.split("_")[0]}.md',
             mime="text/markdown",
@@ -385,11 +389,11 @@ with tab_func:
         )
     with c3:
         st.button(
-            "删除所有窗口", use_container_width=True, on_click=delete_all_chat_button_callback
+            "Удалить все окна", use_container_width=True, on_click=delete_all_chat_button_callback
         )
 
     st.write("\n")
-    st.markdown("自定义功能：")
+    st.markdown("Пользовательские функции：")
     c1, c2 = st.columns(2)
     with c1:
         if "open_text_toolkit_value" in st.session_state:
@@ -397,7 +401,7 @@ with tab_func:
         else:
             default = True
         st.checkbox(
-            "开启文本下的功能组件",
+            "Включите функциональные компоненты под текстом",
             value=default,
             key="open_text_toolkit",
             on_change=save_set,
@@ -409,7 +413,7 @@ with tab_func:
         else:
             default = True
         st.checkbox(
-            "开启语音输入组件",
+            "Включить компонент голосового ввода",
             value=default,
             key="open_voice_toolkit",
             on_change=save_set,
@@ -420,7 +424,7 @@ with tap_input:
 
     def input_callback():
         if st.session_state["user_input_area"] != "":
-            # 修改窗口名称
+            # Изменить имя окна
             user_input_content = st.session_state["user_input_area"]
             df_history = pd.DataFrame(st.session_state["history" + current_chat])
             if df_history.empty or len(df_history.query('role!="system"')) == 0:
@@ -429,15 +433,15 @@ with tap_input:
 
     with st.form("input_form", clear_on_submit=True):
         user_input = st.text_area(
-            "**输入：**",
+            "**Вход：**",
             key="user_input_area",
-            help="内容将以Markdown格式在页面展示，建议遵循相关语言规范，同样有利于GPT正确读取，例如："
-            "\n- 代码块写在三个反引号内，并标注语言类型"
-            "\n- 以英文冒号开头的内容或者正则表达式等写在单反引号内",
+            help="Содержимое будет отображаться на странице в формате Markdown, рекомендуется следовать соответствующим языковым спецификациям, что также способствует правильному чтению по GPT, например:"
+            "\n- Блок кода записывается в трех обратных кавычках и помечается типом языка."
+            "\n- Содержимое, начинающееся с английского двоеточия или регулярных выражений, должно быть записано в одинарных обратных кавычках.",
             value=st.session_state["user_voice_value"],
         )
         submitted = st.form_submit_button(
-            "确认提交", use_container_width=True, on_click=input_callback
+            "подтвердить отправку", use_container_width=True, on_click=input_callback
         )
     if submitted:
         st.session_state["user_input_content"] = user_input
@@ -448,9 +452,9 @@ with tap_input:
         "open_voice_toolkit_value" not in st.session_state
         or st.session_state["open_voice_toolkit_value"]
     ):
-        # 语音输入功能
+        # Функция голосового ввода
         vocie_result = voice_toolkit()
-        # vocie_result会保存最后一次结果
+        # vocie_result Последний результат будет сохранен
         if (
             vocie_result and vocie_result["voice_result"]["flag"] == "interim"
         ) or st.session_state["voice_flag"] == "interim":
@@ -462,7 +466,7 @@ with tap_input:
 
 
 def get_model_input():
-    # 需输入的历史记录
+    # Записи истории, которые необходимо внести
     context_level = st.session_state["context_level" + current_chat]
     history = get_history_input(
         st.session_state["history" + current_chat], context_level
@@ -473,7 +477,7 @@ def get_model_input():
     ]:
         if ctx != "":
             history = [{"role": "system", "content": ctx}] + history
-    # 设定的模型参数
+    # установить параметры модели
     paras = {
         "temperature": st.session_state["temperature" + current_chat],
         "top_p": st.session_state["top_p" + current_chat],
@@ -489,24 +493,24 @@ if st.session_state["user_input_content"] != "":
         st.session_state[current_chat + "report"] = ""
     st.session_state["pre_user_input_content"] = st.session_state["user_input_content"]
     st.session_state["user_input_content"] = ""
-    # 临时展示
+    # временный дисплей
     show_each_message(
         st.session_state["pre_user_input_content"],
         "user",
         "tem",
         [area_user_svg.markdown, area_user_content.markdown],
     )
-    # 模型输入
+    # Ввод модели
     history_need_input, paras_need_input = get_model_input()
-    # 调用接口
+    # Интерфейс вызова
     with st.spinner("🤔"):
         try:
             if apikey := st.session_state["apikey_input"]:
                 openai.api_key = apikey
-            # 配置临时apikey，此时不会留存聊天记录，适合公开使用
+            # Настройте временный ключ API. Записи чата в настоящее время не сохраняются и доступны для публичного использования.
             elif "apikey_tem" in st.secrets:
                 openai.api_key = st.secrets["apikey_tem"]
-            # 注：当st.secrets中配置apikey后将会留存聊天记录，即使未使用此apikey
+            # Примечание. Если в st.secrets настроен ключ API, записи чата будут сохраняться, даже если этот ключ API не используется.
             else:
                 openai.api_key = st.secrets["apikey"]
             r = openai.ChatCompletion.create(
@@ -517,17 +521,17 @@ if st.session_state["user_input_content"] != "":
             )
         except (FileNotFoundError, KeyError):
             area_error.error(
-                "缺失 OpenAI API Key，请在复制项目后配置Secrets，或者在模型选项中进行临时配置。"
-                "详情见[项目仓库](https://github.com/PierXuY/ChatGPT-Assistant)。"
+                "Ключ OpenAI API отсутствует. Настройте секреты после копирования проекта или настройте их временно в параметрах модели."
+                "Подробности см. в разделе [Склад проекта].(https://github.com/PuchBuch/ChatGPT-Assistant)。"
             )
         except openai.error.AuthenticationError:
-            area_error.error("无效的 OpenAI API Key。")
+            area_error.error("Неверный ключ API OpenAI.")
         except openai.error.APIConnectionError as e:
-            area_error.error("连接超时，请重试。报错：   \n" + str(e.args[0]))
+            area_error.error("Время соединения истекло, попробуйте еще раз. Сообщается об ошибке:   \n" + str(e.args[0]))
         except openai.error.InvalidRequestError as e:
-            area_error.error("无效的请求，请重试。报错：   \n" + str(e.args[0]))
+            area_error.error("Неверный запрос, попробуйте еще раз. Сообщить об ошибке：   \n" + str(e.args[0]))
         except openai.error.RateLimitError as e:
-            area_error.error("请求受限。报错：   \n" + str(e.args[0]))
+            area_error.error("Запросы ограничены. Сообщить об ошибке：   \n" + str(e.args[0]))
         else:
             st.session_state["chat_of_r"] = current_chat
             st.session_state["r"] = r
@@ -555,12 +559,12 @@ if ("r" in st.session_state) and (current_chat == st.session_state["chat_of_r"])
                     [area_gpt_svg.markdown, area_gpt_content.markdown],
                 )
     except ChunkedEncodingError:
-        area_error.error("网络状况不佳，请刷新页面重试。")
-    # 应对stop情形
+        area_error.error("Состояние сети плохое, обновите страницу и повторите попытку.")
+    # Работа со стоп-ситуациями
     except Exception:
         pass
     else:
-        # 保存内容
+        # Сохранить контент
         st.session_state["history" + current_chat].append(
             {"role": "user", "content": st.session_state["pre_user_input_content"]}
         )
@@ -568,12 +572,12 @@ if ("r" in st.session_state) and (current_chat == st.session_state["chat_of_r"])
             {"role": "assistant", "content": st.session_state[current_chat + "report"]}
         )
         write_data()
-    # 用户在网页点击stop时，ss某些情形下会暂时为空
+    # Когда пользователь нажимает кнопку «Стоп» на веб-странице, в некоторых случаях ss будет временно пустым.
     if current_chat + "report" in st.session_state:
         st.session_state.pop(current_chat + "report")
     if "r" in st.session_state:
         st.session_state.pop("r")
         st.experimental_rerun()
 
-# 添加事件监听
+# Добавить прослушиватель событий
 v1.html(js_code, height=0)

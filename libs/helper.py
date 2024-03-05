@@ -36,7 +36,7 @@ def remove_data(path: str, chat_name: str):
         os.remove(f"./{path}/{chat_name}.json")
     except FileNotFoundError:
         pass
-    # 清除缓存
+    # очистить кэш
     try:
         st.session_state.pop('history' + chat_name)
         for item in ["context_select", "context_input", "context_level", *initial_content_all['paras']]:
@@ -101,7 +101,7 @@ def show_messages(current_chat: str, messages: list):
             st.write("---")
 
 
-# 根据context_level提取history
+# в соответствии с context_level извлечь history
 def get_history_input(history: list, level: int) -> list:
     if level != 0 and history:
         df_input = pd.DataFrame(history).query('role!="system"')
@@ -112,18 +112,18 @@ def get_history_input(history: list, level: int) -> list:
     return res
 
 
-# 去除#号右边的空格
+# убрать пробел справа от знака #
 # def remove_hashtag_right__space(text: str) -> str:
 #     text = re.sub(r"(#+)\s*", r"\1", text)
 #     return text
 
 
-# 提取文本
+# извлечь текст
 def extract_chars(text: str, num: int) -> str:
     char_num = 0
     chars = ''
     for char in text:
-        # 汉字算两个字符
+        # Китайские иероглифы считаются за два иероглифа
         if '\u4e00' <= char <= '\u9fff':
             char_num += 2
         else:

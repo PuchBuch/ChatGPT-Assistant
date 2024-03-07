@@ -11,6 +11,7 @@ from voice_toolkit import voice_toolkit
 
 if "apikey" in st.secrets:
     openai.api_base = st.secrets["apikey"]
+    print(f"{openai.api_base}")
 else:
     openai.api_base = "https://api.openai.com/v1"
 

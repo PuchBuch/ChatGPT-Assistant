@@ -9,8 +9,8 @@ from requests.models import ChunkedEncodingError
 from streamlit.components import v1
 from voice_toolkit import voice_toolkit
 
-if "OPENAI_API_KEY" in st.secrets:
-    openai.api_base = st.secrets["OPENAI_API_KEY"]
+if "apibase" in st.secrets:
+    openai.api_base = st.secrets["apibase"]
     print(f"{openai.api_base}")
 else:
     openai.api_base = "https://api.openai.com/v1"

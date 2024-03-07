@@ -522,7 +522,7 @@ if st.session_state["user_input_content"] != "":
         except (FileNotFoundError, KeyError):
             area_error.error(
                 "Ключ OpenAI API отсутствует. Настройте секреты после копирования проекта или настройте их временно в параметрах модели."
-                "Подробности см. в разделе [Склад проекта].(https://github.com/PuchBuch/ChatGPT-Assistant)。"
+                "Подробности см. в разделе [Склад проекта].(https://github.com/PuchBuch/ChatGPT-Assistant"
             )
         except openai.error.AuthenticationError:
             area_error.error("Неверный ключ API OpenAI.")

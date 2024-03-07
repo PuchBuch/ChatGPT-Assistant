@@ -23,14 +23,14 @@ init()
 
 
 //// parent.js
-// 获取可选语音
+//Получите дополнительные голоса
 window.speechSynthesis.onvoiceschanged = () => {
     let voices = window.speechSynthesis.getVoices();
     window.parent.voices = voices
     let defaultLanguage;
     let browserLanguage = navigator.language;
 
-    // 参考自 https://chrome.google.com/webstore/detail/voice-control-for-chatgpt/eollffkcakegifhacjnlnegohfdlidhn
+    // Ссылка из https://chrome.google.com/webstore/detail/voice-control-for-chatgpt/eollffkcakegifhacjnlnegohfdlidhn
     const languageAll = [["普通话 (中国大陆)", "zh-CN"], ["中文 (中国台灣)", "zh-TW"], ["粵語 (中国香港)", "zh-HK"], ["English (US)", "en-US"], ["English (UK)", "en-GB"], ["English (IN)", "en-IN"], ["Afrikaans", "af-ZA"], ["Bahasa Indonesia", "id-ID"], ["Bahasa Melayu", "ms-MY"], ["Català", "ca-ES"], ["Čeština", "cs-CZ"], ["Dansk", "da-DK"], ["Deutsch", "de-DE"], ["Español (ES)", "es-ES"], ["Français", "fr-FR"], ["Galego", "gl-ES"], ["Hrvatski", "hr_HR"], ["IsiZulu", "zu-ZA"], ["Íslenska", "is-IS"], ["Italiano", "it-IT"], ["Magyar", "hu-HU"], ["Nederlands", "nl-NL"], ["Norsk bokmål", "nb-NO"], ["Polski", "pl-PL"], ["Português (PT)", "pt-PT"], ["Română", "ro-RO"], ["Slovenčina", "sk-SK"], ["Suomi", "fi-FI"], ["Svenska", "sv-SE"], ["Türkçe", "tr-TR"], ["български", "bg-BG"], ["日本語", "ja-JP"], ["한국어", "ko-KR"], ["Pусский", "ru-RU"], ["Српски", "sr-RS"]];
     let languageArray = [];
 
@@ -135,7 +135,7 @@ window.speechSynthesis.onvoiceschanged = () => {
 let recordBtn = document.getElementById('record-btn');
 const toggleBtn = document.getElementById("toggle-btn");
 const speedSelect = document.getElementById('speed');
-// 语音识别对象
+// объект распознавания речи
 let recognition = new webkitSpeechRecognition;
 recognition.continuous = true; // 设置为连续模式
 recognition.interimResults = true; // 获取中间结果
@@ -217,14 +217,14 @@ recognition.onresult = function (event) {
     }
 }
 
-// 保证未点击结束时录音处于开启状态
+// Убедитесь, что запись включена, когда стоп не нажат
 recognition.onend = function () {
     if (recordBtn.classList.contains('recording')) {
         recognition.start();
     }
 }
 
-// 自动播放按钮
+// кнопка автозапуска
 toggleBtn.addEventListener('click', function () {
     let btnClassList = toggleBtn.querySelector('i').classList
     if (btnClassList.contains('fa-volume-high')) {
@@ -243,8 +243,8 @@ toggleBtn.addEventListener('click', function () {
 })
 
 
-//// autoPlay.js   参考自开源项目https://github.com/C-Nedelcu/talk-to-chatgpt
-// 语音合成对象
+//// autoPlay.js   Ссылки из проектов с открытым исходным кодом https://github.com/C-Nedelcu/talk-to-chatgpt
+// объект синтеза речи
 const synth = window.parent.speechSynthesis;
 synth.cancel()
 let TIMEOUT_KEEP_SYNTHESIS_WORKING = null;
@@ -263,7 +263,7 @@ function KeepSpeechSynthesisActive() {
     TIMEOUT_KEEP_SYNTHESIS_WORKING = setTimeout(KeepSpeechSynthesisActive, 5000);
 }
 
-// 播报函数
+// функция трансляции
 function SayOutLoud(text) {
     const utterance = new SpeechSynthesisUtterance();
     utterance.text = text;
@@ -278,7 +278,7 @@ function SayOutLoud(text) {
     utterance.onstart = () => {
         clearTimeout(TIMEOUT_KEEP_SYNTHESIS_WORKING);
         TIMEOUT_KEEP_SYNTHESIS_WORKING = setTimeout(KeepSpeechSynthesisActive, 5000);
-        // 播放时关闭录音
+        // Отключить запись во время воспроизведения
         if (recordBtn.classList.contains('recording')) {
             recordBtn.click()
         }
@@ -290,7 +290,7 @@ function SayOutLoud(text) {
 }
 
 
-// 分割文段
+// Разделить абзацы
 function SplitIntoSentences(text) {
     const sentences = [];
     let currentSentence = "";
@@ -365,7 +365,7 @@ function CheckNewMessages() {
     let HrElementCount = window.parent.document.querySelectorAll("section.main hr").length
     let errorElement = window.parent.document.querySelector("div[data-baseweb='notification']")
 
-    // hr元素未出现并且没有报错
+    // Элемент hr не отображается, и об ошибках не сообщается
     if ((preHrElementCount !== HrElementCount - 1) && !errorElement) {
         KEEP_CheckNewMessages = setTimeout(CheckNewMessages, 500);
 
@@ -375,8 +375,8 @@ function CheckNewMessages() {
 }
 
 
-//// 监听主页事件
-// 监听主页提交按钮，触发监控
+//// Слушайте события на главной странице
+// Отслеживайте кнопку отправки на главной странице и запускайте мониторинг.
 function checkFormSubmit() {
     let stFormSubmit = window.parent.document.querySelector('button[kind="secondaryFormSubmit"]');
     if (stFormSubmit) {
@@ -411,7 +411,7 @@ function showPlayBtn() {
     }
 }
 
-// 监听页面切换chat
+// Мониторить переключение страниц чата
 function checkChatRadioBlock() {
     const stChatRadioBlock = window.parent.document.querySelector('section[data-testid="stSidebar"] div[data-testid="stVerticalBlock"] div[data-testid="stVerticalBlock"]:has(div[role="radiogroup"])');
     if (stChatRadioBlock) {
@@ -419,9 +419,9 @@ function checkChatRadioBlock() {
             attributes: true,
             subtree: true
         };
-        // 创建MutationObserver实例
+        // Создайте экземпляр MutationObserver.
         const observer = new MutationObserver((mutationsList, observer) => {
-            // 监控到变化时的回调函数
+            // Функция обратного вызова при обнаружении изменений
             for (let mutation of mutationsList) {
                 if (mutation.type === 'attributes' && mutation.attributeName === 'tabindex') {
                     showPlayBtn()
@@ -430,7 +430,7 @@ function checkChatRadioBlock() {
                 }
             }
         });
-        // 启动MutationObserver
+        // СтартМутацияОбсервер
         observer.observe(stChatRadioBlock, config);
     } else {
         setTimeout(checkChatRadioBlock, 500);
@@ -439,7 +439,7 @@ function checkChatRadioBlock() {
 
 checkChatRadioBlock()
 
-// 监控页面增删chat
+// Отслеживать добавление страниц и удаление чата
 function checkChatButton() {
     let stChatButtonAll = window.parent.document.querySelectorAll('section[data-testid="stSidebar"] button[kind="secondary"]');
     if (stChatButtonAll.length === 2) {

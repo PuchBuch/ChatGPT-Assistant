@@ -1,5 +1,5 @@
 from .set_context import set_context
-
+from .set_context_ru import set_context_ru
 # имя пользователя
 user_name = 'User'
 gpt_name = 'ChatGPT'
@@ -30,7 +30,7 @@ initial_content_all = {
 }
 # context
 set_context_all = {"Не задано": ""}
-set_context_all.update(set_context)
+set_context_all.update(set_context_ru)
 
 # Пользовательский CSS, JS
 css_code = """
